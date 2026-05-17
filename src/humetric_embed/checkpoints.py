@@ -12,13 +12,16 @@ from humetric_embed.errors import CheckpointMalformed, CheckpointMissing, EmbedE
 
 @dataclass(frozen=True, slots=True)
 class EmbeddingBundle:
-    """A `.npy` matrix paired with a list of person ids in matching row order.
+    """A `.npy` matrix paired with a list of entity ids in matching row order.
 
-    Produced by `humetric-train` jobs (LightGCN, two-tower). Inference just
-    consumes the bundle and feeds it to FAISS via `humetric-store`.
+    Entity ids are the prefixed form (`p:gh:octocat`, `o:gh:anthropic`) so the
+    same bundle can mix persons and organizations — the type is implicit in
+    the id prefix and recoverable via `humetric_core.entity_type_of`.
+
+    Produced by `humetric-train` jobs (LightGCN, two-tower, embed_corpus).
     """
 
-    person_ids: tuple[str, ...]
+    entity_ids: tuple[str, ...]
     vectors: np.ndarray  # shape (n, dim), float32
 
     @property
@@ -64,7 +67,7 @@ def _load_bundle(dir_path: Path, kind: str) -> Result[EmbeddingBundle, EmbedErro
 
     return Ok(
         EmbeddingBundle(
-            person_ids=tuple(ids_data),
+            entity_ids=tuple(ids_data),
             vectors=np.ascontiguousarray(vecs, dtype=np.float32),
         )
     )

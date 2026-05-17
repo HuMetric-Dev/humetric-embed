@@ -20,12 +20,12 @@ def _write_bundle(d: Path, kind: str, ids: list[str], vecs: np.ndarray) -> None:
 
 
 def test_graph_roundtrip(tmp_path: Path) -> None:
-    ids = ["gh:a", "gh:b", "gh:c"]
+    ids = ["p:gh:a", "p:gh:b", "o:gh:c"]
     vecs = np.random.randn(3, 8).astype(np.float32)
     _write_bundle(tmp_path, "graph", ids, vecs)
 
     bundle = load_graph_embeddings(tmp_path).unwrap()
-    assert bundle.person_ids == tuple(ids)
+    assert bundle.entity_ids == tuple(ids)
     assert bundle.vectors.shape == (3, 8)
     assert bundle.dim == 8
 
